@@ -14,6 +14,10 @@ check_success() {
         exit 1
     fi
 }
+echo "Starting adb!"
+until adb devices -l; do
+    sleep 1
+done
 
 echo "Everything disconnected!"
 until adb disconnect; do
