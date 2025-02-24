@@ -15,11 +15,6 @@ check_success() {
     fi
 }
 
-echo "Currently connected!"
-until adb devices -l; do
-    sleep 1
-done
-
 echo "Everything disconnected!"
 until adb disconnect; do
     sleep 1
@@ -36,11 +31,19 @@ until adb tcpip 5555; do
     check_success "ADB TCP/IP Mode"
 done
 
+sleep 4
+
 echo "Reconnecting to localhost:5555..."
 until adb connect localhost:5555; do
     echo "Retrying..."
 done
 
+echo "Connecting to $WIRELESS_IP..."
+until adb disconnect "$WIRELESS_IP"; do
+    check_success "ADB Connect Wireless"
+done
+sleep 3
 # Verify connection
 adb devices -l
+echo "Currently connected!"
 echo "ADB over Wi-Fi setup complete."
