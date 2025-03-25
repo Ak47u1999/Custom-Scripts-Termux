@@ -1,5 +1,5 @@
-q#!/bin/bash
-set -euo pipefail
+#!/bin/bash
+set -uo pipefail  # Removed `-e` to prevent script from exiting on failure
 
 # Function: list_third_party_apps
 # Description: Uses ADB to retrieve a list of third-party app package names.
@@ -13,13 +13,15 @@ list_third_party_apps() {
 #   $1 - The package name.
 clear_app_data() {
     local package="$1"
-    
+
     if [[ "$package" == "com.termux" ]]; then
-            return 0  # is excluded
+        return 0  # Exclude Termux from being cleared
     fi
-    
+
     echo "Clearing data for ${package}..."
-    adb shell pm clear "${package}"
+    if ! adb shell pm clear "${package}"; then
+        echo "Failed to clear data for ${package}"
+    fi
 }
 
 # Function: check_adb_connection
@@ -45,9 +47,7 @@ main() {
     echo "Starting to clear data for all third-party apps..."
     local apps
     apps=$(list_third_party_apps)
-    echo $(apps)
-    sleep 2
-    
+
     if [ -z "$apps" ]; then
         echo "No third-party apps found or unable to retrieve the list."
         exit 0
@@ -57,7 +57,7 @@ main() {
         clear_app_data "${app}"
     done
 
-    echo "All third-party app data has been cleared."
+    echo "All possible third-party app data has been processed."
 }
 
 # Execute the main function.
